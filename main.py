@@ -1,4 +1,5 @@
 from views.home import ft, Home, asyncio
+from views.admin import Login
 
 def main(page: ft.Page):
     page.title = 'project title'
@@ -10,6 +11,9 @@ def main(page: ft.Page):
 
         if page.route == '/':
             page.views.append(home)
+        
+        elif page.route == '/admin/login':
+            page.views.append(Login(page=page))
         
         page.update()
     

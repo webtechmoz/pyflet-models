@@ -1,0 +1,3 @@
+assets/*.png
+database/*.db
+__pycache__/
