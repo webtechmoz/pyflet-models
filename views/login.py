@@ -5,7 +5,7 @@ from controls.controls import (
     View,
     ElevantedButton
 )
-from database.database import Database
+from database.database import Database, Filter
 
 class Login(View):
     def __init__(
@@ -52,12 +52,12 @@ class TextFieldSpace(ft.Container):
         )
         self.content = ft.Column(
             controls=[
-                TextField(
+                username := TextField(
                     hint_text='Username',
                     prefix_icon=ft.Icons.PERSON,
                     autofocus=True
                 ),
-                TextField(
+                password := TextField(
                     hint_text='Password',
                     prefix_icon=ft.Icons.KEY,
                     password=True
@@ -65,16 +65,43 @@ class TextFieldSpace(ft.Container):
                 ft.ResponsiveRow(
                     controls=[
                         ElevantedButton(
-                            text='Login'
+                            text='Login',
+                            on_click=self.verifiy_login
                         )
                     ]
                 )
             ],
             spacing=15
         )
+        self.username = username
+        self.password = password
     
-    def verifiy_login(e: ft.ControlEvent):
-        ...
+    def verifiy_login(self, e: ft.ControlEvent):
+        if self.username.value and self.password.value:
+            user_details = self.database.select_data(
+                table_name='users',
+                columns=['username'],
+                condition=Filter(
+                    column='username'
+                ).EQUAL(
+                    value=self.username.value
+                ).AND.filterby(
+                    column='password'
+                ).EQUAL(
+                    value=self.database.db.encrypt_value(
+                        value=self.password.value
+                    )
+                )
+            )
+
+            if len(user_details) == 1:
+                e.page.data = user_details[0][0]
+                e.page.go('/admin/dashboard')
+        
+        self.username.value = ''
+        self.password.value = ''
+        self.username.focus()
+        e.page.update()
 
 class Title(ft.Container):
     def __init__(

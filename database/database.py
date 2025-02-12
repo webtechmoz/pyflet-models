@@ -20,6 +20,16 @@ class Database:
                         column_type=self.db.Column_types.text
                     ),
                     self.db.Column(
+                        name='email',
+                        not_null=True,
+                        column_type=self.db.Column_types.text
+                    ),
+                    self.db.Column(
+                        name='usertype',
+                        not_null=True,
+                        column_type=self.db.Column_types.text
+                    ),
+                    self.db.Column(
                         name='password',
                         not_null=True,
                         column_type=self.db.Column_types.text
@@ -31,27 +41,6 @@ class Database:
                     )
                 ]
             )
-
-            if not self.select_data(table_name='users'):
-                self.insert_data(
-                    table_name='users',
-                    data_query=[
-                        self.db.ColumnData(
-                            column='username',
-                            value='Admin'
-                        ),
-                        self.db.ColumnData(
-                            column='password',
-                            value=self.db.encrypt_value(
-                                value='Admin'
-                            )
-                        ),
-                        self.db.ColumnData(
-                            column='status',
-                            value='Active'
-                        )
-                    ]
-                )
     
     def create_table(self, table_name: str, columns: list[Column]):
         self.db.create_table(

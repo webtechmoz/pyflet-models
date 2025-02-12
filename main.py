@@ -1,8 +1,19 @@
 from views.home import ft, Home, asyncio
-from views.admin import Login
+from views.login import Login
+from views.dashboard import Dashboard
 
 def main(page: ft.Page):
     page.title = 'project title'
+    page.route = '/admin/dashboard'
+    page.theme = ft.Theme(
+        page_transitions=ft.PageTransitionsTheme(
+            windows=ft.PageTransitionTheme.NONE,
+            android=ft.PageTransitionTheme.NONE,
+            ios=ft.PageTransitionTheme.NONE,
+            linux=ft.PageTransitionTheme.NONE,
+            macos=ft.PageTransitionTheme.NONE,
+        )
+    )
 
     home = Home(page=page)
 
@@ -14,6 +25,13 @@ def main(page: ft.Page):
         
         elif page.route == '/admin/login':
             page.views.append(Login(page=page))
+        
+        elif page.route in ['/admin' ,'/admin/dashboard']:
+            if page.data:
+                page.views.append(Dashboard(page=page))
+            
+            else:
+                page.go('/admin/login')
         
         page.update()
     

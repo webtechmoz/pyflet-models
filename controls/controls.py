@@ -77,6 +77,48 @@ class TextField(ft.TextField):
         self.on_submit = on_submit
         self.on_change = on_change
 
+class TextButton(ft.Container):
+    def __init__(
+        self,
+        page: ft.Page,
+        text: str,
+        icon: ft.Icons = None,
+        bgcolor: ft.Colors = None,
+        font_weight: ft.FontWeight = ft.FontWeight.W_300,
+        text_color: ft.Colors = ft.Colors.BLUE,
+        icon_color: ft.Colors = ft.Colors.BLUE,
+        on_click: ft.ControlEvent = None,
+        on_hover: ft.HoverEvent = None
+    ):
+        super().__init__()
+        self.page = page
+        self.on_click = on_click
+        self.on_hover = on_hover
+        self.bgcolor = bgcolor
+        self.text_color = text
+        self.padding = ft.padding.only(left=6, top=2, bottom=2, right=6)
+        self.content = ft.Row(controls=[], spacing=2)
+
+        if icon:
+            self.content.controls.append(
+                ft.Icon(
+                    name=icon,
+                    color=icon_color if icon_color else self.text_color,
+                    size=15
+                )
+            )
+        
+        if text:
+            self.content.controls.append(
+                Text(
+                    value=text,
+                    color=text_color,
+                    size=12,
+                    weight=font_weight
+                )
+            )
+        
+
 class ElevantedButton(ft.ElevatedButton):
     def __init__(
         self,
@@ -99,6 +141,45 @@ class ElevantedButton(ft.ElevatedButton):
                 radius=2
             )
         )
+
+class Appbar(ft.AppBar):
+    def __init__(
+        self,
+        page: ft.Page,
+        title: str
+    ):
+        super().__init__()
+        self.page = page
+        self.title = Text(
+            value=title,
+            size=16,
+            color=ft.Colors.WHITE,
+            weight='normal'
+        )
+        self.toolbar_height = 40
+        self.bgcolor = ft.Colors.GREEN_600
+        self.actions = [
+            ft.Container(
+                content=ft.Row(
+                    controls=[
+                        ft.Container(
+                            height=35,
+                            width=35,
+                            border_radius=60,
+                            bgcolor=ft.Colors.with_opacity(0.80, 'white'),
+                            alignment=ft.alignment.center,
+                            content=Text(
+                                value=page.data[0].upper(),
+                                color=self.bgcolor,
+                                size=16,
+                                weight='bold'
+                            )
+                        )
+                    ]
+                ),
+                padding=ft.padding.only(right=6)
+            )
+        ]
 
 class DateTime():
     def __init__(
