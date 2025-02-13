@@ -1,7 +1,5 @@
-import multiprocessing.process
 from manage_sql import SQLITE
-from manage_sql.Utils.SQLITE import Column, Filter, ColumnData
-import multiprocessing
+from manage_sql.Utils.utils_sqlite import Column, ColumnData, Filter
 
 class Database:
     def __init__(
@@ -45,20 +43,16 @@ class Database:
             )
     
     def create_table(self, table_name: str, columns: list[Column]):
-        process = multiprocessing.Process(
-            target=self.db.create_table,
-            args=(table_name, columns),
-            daemon=True
+        self.db.create_table(
+            tablename=table_name,
+            columns=columns
         )
-        process.start()
     
     def insert_data(self, table_name: str, data_query: list[ColumnData]):
-        process = multiprocessing.Process(
-            target=self.db.insert_data,
-            args=(table_name,data_query),
-            daemon=True
+        self.db.insert_data(
+            tablename=table_name,
+            insert_query=data_query
         )
-        process.start()
     
     def select_data(self, table_name: str, columns: list[str] = ['*'], condition: Filter = None):
         return self.db.select_data(
