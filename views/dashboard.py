@@ -1,11 +1,13 @@
 from controls.controls import (
     ft,
-    Text,
     View,
+    Appbar,
+    Table,
+    RowTable,
+    AlertDialog,
     TextField,
     ElevantedButton,
-    TextButton,
-    Appbar
+    Dropdown
 )
 
 class Dashboard(View):
@@ -28,8 +30,20 @@ class Dashboard(View):
                                     page=self.page,
                                     header_title='Authorization & Authentication',
                                     rows=[
-                                        RowTable(page=self.page, title='Groups'),
-                                        RowTable(page=self.page, title='Users')
+                                        RowTable(
+                                            page=self.page,
+                                            title='Groups',
+                                            title_on_click=self.show_groups,
+                                            add_on_click=self.add_group,
+                                            change_on_click=self.edit_group
+                                        ),
+                                        RowTable(
+                                            page=self.page,
+                                            title='Users',
+                                            title_on_click=self.show_users,
+                                            add_on_click=self.add_user,
+                                            change_on_click=self.edit_user
+                                        )
                                     ]
                                 )
                             ]
@@ -38,70 +52,95 @@ class Dashboard(View):
                 ]
             )
         ]
+    
+    def show_users(self, e: ft.ControlEvent):
+        ...
+    
+    def show_groups(self, e: ft.ControlEvent):
+        ...
+    
+    def add_user(self, e: ft.ControlEvent):
+        AddUser(page=self.page)
+        e.page.update()
+    
+    def edit_user(self, e: ft.ControlEvent):
+        ...
+    
+    def add_group(self, e: ft.ControlEvent):
+        ...
+    
+    def edit_group(self, e: ft.ControlEvent):
+        ...
 
-class Header(ft.Container):
+class AddUser(AlertDialog):
     def __init__(
         self,
-        title: str
+        page: ft.Page
     ):
-        super().__init__()
-        self.bgcolor = ft.Colors.GREEN_600
-        self.alignment = ft.alignment.center
-        self.height = 30
-        self.padding = ft.padding.only(left=6)
-        self.content = Text(
-            value=title,
-            color=ft.Colors.WHITE,
-            weight='normal'
+        super().__init__(
+            page=page,
+            title='Add User',
+            title_color=ft.Colors.with_opacity(
+                opacity=0.80,
+                color=ft.Colors.BLACK
+            ),
+            title_size=18
         )
 
-class RowTable(ft.Container):
-    def __init__(
-        self,
-        page: ft.Page,
-        title: str
-    ):
-        super().__init__()
-        self.page = page
-        self.content = ft.Row(
-            controls=[
-                TextButton(page=page, text=title, font_weight='w700'),
-                ft.Row(
-                    controls=[
-                        TextButton(page=page, text='Add', icon=ft.Icons.ADD, font_weight='w300'),
-                        TextButton(page=page, text='Change', icon=ft.Icons.EDIT, font_weight='w300')
-                    ],
-                    spacing=4
-                )
-            ],
-            alignment=ft.MainAxisAlignment.SPACE_BETWEEN
-        )
-        self.border = ft.border.only(
-            bottom=ft.BorderSide(
-                width=0.2,
-                color=ft.Colors.with_opacity(0.5, 'grey')
+        self.actions=[
+            ft.ResponsiveRow(
+                controls=[
+                    ElevantedButton(
+                        text='Add user'
+                    )
+                ]
             )
-        )
+        ]
 
-class Table(ft.Container):
-    def __init__(
-        self,
-        page: ft.Page,
-        header_title: str,
-        rows: list[RowTable] = None
-    ):
-        super().__init__()
-        self.page = page
-        self.col = {'xs': 12, 'sm': 6}
-        self.header_title = header_title
-        self.alignment = ft.alignment.center
-        self.padding = ft.padding.all(0)
         self.content = ft.Column(
             controls=[
-                Header(title=self.header_title),
-                ft.Column(
-                    controls=rows if rows else []
+                ft.ResponsiveRow(
+                    controls=[
+                        TextField(
+                            hint_text='Username',
+                            autofocus=True,
+                            prefix_icon=ft.Icons.PERSON
+                        ),
+                        TextField(
+                            hint_text='Email',
+                            autofocus=True,
+                            prefix_icon=ft.Icons.EMAIL
+                        ),
+                        Dropdown(
+                            hint_text= 'usertype',
+                            icon= ft.Icons.LINE_STYLE,
+                            options=[
+                                ft.dropdown.Option(
+                                    key=user_role
+                                ) for user_role in ['superuser', 'seller', 'manager']
+                            ]
+                        ),
+                        Dropdown(
+                            hint_text= 'status',
+                            icon= ft.Icons.LINE_STYLE,
+                            options=[
+                                ft.dropdown.Option(
+                                    key=user_role
+                                ) for user_role in ['active', 'desactive']
+                            ]
+                        ),
+                        TextField(
+                            hint_text='Password',
+                            autofocus=True,
+                            prefix_icon=ft.Icons.KEY,
+                            password=True,
+                            can_reavel_password=True
+                        )
+                    ]
                 )
-            ],
-            spacing=6
+            ]
         )
+
+        self.page = page
+        self.page.overlay.append(self)
+        self.open = True

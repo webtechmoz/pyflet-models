@@ -4,7 +4,6 @@ from views.dashboard import Dashboard
 
 def main(page: ft.Page):
     page.title = 'project title'
-    page.route = '/admin'
     page.theme = ft.Theme(
         page_transitions=ft.PageTransitionsTheme(
             windows=ft.PageTransitionTheme.NONE,
@@ -18,7 +17,7 @@ def main(page: ft.Page):
     home = Home(page=page)
     private_routes: list[str] = [
         '/admin',
-        '/admin/login'
+        '/admin/dashboard'
     ]
 
     def router(route: str):
