@@ -1,6 +1,6 @@
-from views.home import ft, Home, asyncio
-from views.login import Login
-from views.dashboard import Dashboard
+from views.public.home import ft, Home, asyncio
+from views.public.login import Login
+from views.public.dashboard import Dashboard
 
 def main(page: ft.Page):
     page.title = 'project title'
@@ -31,7 +31,8 @@ def main(page: ft.Page):
         
         elif page.route in private_routes:
             if page.data:
-                page.views.append(Dashboard(page=page))
+                if page.route == '/admin/dashboard':
+                    page.views.append(Dashboard(page=page))
             
             else:
                 page.go('/admin/login')

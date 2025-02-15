@@ -379,7 +379,7 @@ class AlertDialog(ft.AlertDialog):
             left=4,
             right=4,
             top=8,
-            bottom=8
+            bottom=0
         )
         self.actions_padding = ft.padding.only(
             left=4,
@@ -387,7 +387,6 @@ class AlertDialog(ft.AlertDialog):
             top=8,
             bottom=8
         )
-        self.col = {'xs': 12}
         self.content = ft.Column(
             controls=[
                 userfields_group := ft.ResponsiveRow(

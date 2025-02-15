@@ -25,7 +25,7 @@ class Dashboard(View):
         self.controls = [
             ft.Column(
                 controls=[
-                    ft.Container(
+                    tables := ft.Container(
                         padding=ft.padding.only(left=10, right=10),
                         content=ft.ResponsiveRow(
                             controls=[
@@ -55,6 +55,12 @@ class Dashboard(View):
                 ]
             )
         ]
+
+        self.tables = tables.content.controls
+    
+    def add_tables(self, tables: list[Table]):
+        self.tables.extend(tables)
+        self.page.update()
     
     def show_users(self, e: ft.ControlEvent):
         ...

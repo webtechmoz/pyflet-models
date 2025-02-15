@@ -1,5 +1,7 @@
 assets/*.png
 database/*.db
 __pycache__/
+views/private/*
+storage/
 
 .gitignore
