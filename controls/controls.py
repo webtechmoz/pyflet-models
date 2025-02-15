@@ -388,6 +388,54 @@ class AlertDialog(ft.AlertDialog):
             bottom=8
         )
         self.col = {'xs': 12}
+        self.content = ft.Column(
+            controls=[
+                userfields_group := ft.ResponsiveRow(
+                    controls=[
+                        TextField(
+                            hint_text='Username',
+                            autofocus=True,
+                            prefix_icon=ft.Icons.PERSON
+                        ),
+                        TextField(
+                            hint_text='Email',
+                            autofocus=False,
+                            prefix_icon=ft.Icons.EMAIL
+                        ),
+                        Dropdown(
+                            hint_text= 'usertype',
+                            icon= ft.Icons.LINE_STYLE,
+                            options=[
+                                ft.dropdown.Option(
+                                    key=user_role
+                                ) for user_role in ['superuser', 'seller', 'manager']
+                            ]
+                        ),
+                        Dropdown(
+                            hint_text= 'status',
+                            icon= ft.Icons.LINE_STYLE,
+                            options=[
+                                ft.dropdown.Option(
+                                    key=user_role
+                                ) for user_role in ['active', 'desactive']
+                            ]
+                        ),
+                        TextField(
+                            hint_text='Password',
+                            autofocus=False,
+                            prefix_icon=ft.Icons.KEY,
+                            password=True,
+                            can_reavel_password=True
+                        )
+                    ]
+                )
+            ]
+        )
+
+        self.userfields_group = userfields_group
+        self.page = page
+        self.page.overlay.append(self)
+        self.open = True
     
     def close(self, e: ft.ControlEvent):
         self.open = False

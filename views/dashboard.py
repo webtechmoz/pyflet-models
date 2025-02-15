@@ -5,9 +5,12 @@ from controls.controls import (
     Table,
     RowTable,
     AlertDialog,
-    TextField,
     ElevantedButton,
-    Dropdown
+)
+from database.database import (
+    Database,
+    ColumnData,
+    Filter
 )
 
 class Dashboard(View):
@@ -64,7 +67,8 @@ class Dashboard(View):
         e.page.update()
     
     def edit_user(self, e: ft.ControlEvent):
-        ...
+        ChangeUser(page=self.page)
+        e.page.update()
     
     def add_group(self, e: ft.ControlEvent):
         ...
@@ -86,61 +90,141 @@ class AddUser(AlertDialog):
             ),
             title_size=18
         )
-
+        self.database = Database(database='database')
         self.actions=[
             ft.ResponsiveRow(
                 controls=[
                     ElevantedButton(
-                        text='Add user'
+                        text='Add user',
+                        on_click=self.add_user
                     )
                 ]
             )
         ]
+    
+    def add_user(self, e: ft.ControlEvent):
+        user_values: list[str] = []
+        for i, userfield in enumerate(self.userfields_group.controls):
+            if not userfield.value:
+                print(f'Preencha o campo {userfield.hint_text}')
+                break
+            
+            user_values.append(userfield.value)
 
-        self.content = ft.Column(
-            controls=[
-                ft.ResponsiveRow(
-                    controls=[
-                        TextField(
-                            hint_text='Username',
-                            autofocus=True,
-                            prefix_icon=ft.Icons.PERSON
-                        ),
-                        TextField(
-                            hint_text='Email',
-                            autofocus=True,
-                            prefix_icon=ft.Icons.EMAIL
-                        ),
-                        Dropdown(
-                            hint_text= 'usertype',
-                            icon= ft.Icons.LINE_STYLE,
-                            options=[
-                                ft.dropdown.Option(
-                                    key=user_role
-                                ) for user_role in ['superuser', 'seller', 'manager']
-                            ]
-                        ),
-                        Dropdown(
-                            hint_text= 'status',
-                            icon= ft.Icons.LINE_STYLE,
-                            options=[
-                                ft.dropdown.Option(
-                                    key=user_role
-                                ) for user_role in ['active', 'desactive']
-                            ]
-                        ),
-                        TextField(
-                            hint_text='Password',
-                            autofocus=True,
-                            prefix_icon=ft.Icons.KEY,
-                            password=True,
-                            can_reavel_password=True
-                        )
+            if i == len(self.userfields_group.controls) - 1:
+                if not self.database.select_data(
+                    table_name='users', condition=Filter(
+                        column='username'
+                    ).EQUAL(
+                        value=user_values[0].lower()
+                    )
+                ):
+                    self.database.insert_data(
+                        table_name='users',
+                        data_query=[
+                            ColumnData(
+                                column='username',
+                                value=user_values[0].lower()
+                            ),
+                            ColumnData(
+                                column='email',
+                                value=user_values[1]
+                            ),
+                            ColumnData(
+                                column='usertype',
+                                value=user_values[2]
+                            ),
+                            ColumnData(
+                                column='password',
+                                value=self.database.db.encrypt_value(
+                                    value=user_values[4]
+                                )
+                            ),
+                            ColumnData(
+                                column='status',
+                                value=True if user_values[3].lower() == 'active' else False
+                            ),
+                        ]
+                    )
+                
+                else:
+                    print('O usuário que tentas inserir já existe!')
+            
+        for userfield in self.userfields_group.controls:
+            userfield.value = ''
+        
+        user_values.clear()
+        e.page.update()
+
+class ChangeUser(AlertDialog):
+    def __init__(
+        self,
+        page: ft.Page
+    ):
+        super().__init__(
+            page=page,
+            title='Change User',
+            title_color=ft.Colors.with_opacity(
+                opacity=0.80,
+                color=ft.Colors.BLACK
+            ),
+            title_size=18
+        )
+        self.database = Database(database='database')
+        self.curr_user = self.database.select_data(
+            table_name='users',
+            columns=['username', 'email', 'usertype', 'status'],
+            condition=Filter(
+                column='username'
+            ).EQUAL(
+                value=self.page.data
+            )
+        )
+        self.actions=[
+            ft.ResponsiveRow(
+                controls=[
+                    ElevantedButton(
+                        text='Add user',
+                        on_click=self.change_user
+                    )
+                ]
+            )
+        ]
+        
+        for i, userfield in enumerate(self.userfields_group.controls):
+            if i < 3:
+                userfield.value = self.curr_user[0][i]
+            
+            elif i == 3:
+                userfield.value = 'active' if self.curr_user[0][i] == '1' else 'desactive'
+                userfield.disabled = True
+    
+    def change_user(self, e: ft.ControlEvent):
+        user_values: list[list[str, str]] = []
+
+        for i, userfield in enumerate(self.userfields_group.controls):
+            if userfield.value:
+                user_values.append(
+                    [
+                        userfield.hint_text.lower(),
+                        userfield.value if i != 3 else True
                     ]
                 )
-            ]
+        
+        self.database.db.update_data(
+            tablename='users',
+            edit_query=[
+                ColumnData(
+                    column=user[0],
+                    value=user[1] if user[0] != 'password' else self.database.db.encrypt_value(
+                        value=user[1]
+                    )
+                ) for user in user_values
+            ],
+            condition=Filter(
+                column='username'
+            ).EQUAL(
+                value=self.curr_user[0][0]
+            )
         )
-
-        self.page = page
-        self.page.overlay.append(self)
-        self.open = True
+        self.close(e)

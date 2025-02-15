@@ -84,19 +84,26 @@ class TextFieldSpace(ft.Container):
                 condition=Filter(
                     column='username'
                 ).EQUAL(
-                    value=self.username.value
+                    value=self.username.value.lower()
                 ).AND.filterby(
                     column='password'
                 ).EQUAL(
                     value=self.database.db.encrypt_value(
                         value=self.password.value
                     )
+                ).AND.filterby(
+                    column='status'
+                ).EQUAL(
+                    value=True
                 )
             )
 
             if len(user_details) == 1:
                 e.page.data = user_details[0][0]
                 e.page.go('/admin/dashboard')
+            
+            else:
+                print('Username ou password incorrectos')
         
         self.username.value = ''
         self.password.value = ''
